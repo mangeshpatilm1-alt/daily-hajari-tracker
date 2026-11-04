@@ -1,0 +1,141 @@
+here<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5b3cc4">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Daily Hajari Tracker</title>
+<style>
+:root{--p:#5b3cc4;--bg:#f4f2fb;--card:#fff;--text:#211b35;--muted:#716b80;--line:#e9e5f2;--green:#168653;--red:#c34242}
+*{box-sizing:border-box}html,body{min-height:100%;margin:0}body{background:var(--bg);font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif;color:var(--text);padding-bottom:env(safe-area-inset-bottom)}
+header{background:linear-gradient(135deg,#5b3cc4,#8065e8);color:white;padding:calc(18px + env(safe-area-inset-top)) 18px 22px;border-radius:0 0 24px 24px}
+.headrow{display:flex;align-items:center;justify-content:space-between;gap:12px}header h1{font-size:22px;margin:0 0 5px}header p{margin:0;font-size:13px;opacity:.9}
+main{max-width:720px;margin:auto;padding:14px}.card{background:var(--card);border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 3px 14px #33205b0d}
+h2{font-size:17px;margin:0 0 13px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stat{background:#f7f5fd;padding:13px;border-radius:12px}.stat small{display:block;color:var(--muted);font-size:12px}.stat strong{font-size:20px;display:block;margin-top:4px}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 5px}
+input,select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:white;color:var(--text)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{border:0;border-radius:11px;padding:12px 14px;font:600 14px system-ui;cursor:pointer}
+.primary{background:var(--p);color:white;width:100%;margin-top:14px}.secondary{background:#eee9fc;color:var(--p)}.danger{background:#fff0f0;color:var(--red)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions button{flex:1;min-width:100px}
+.entry{border-top:1px solid var(--line);padding:11px 0;display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.entry b{display:block;font-size:14px}.muted{color:var(--muted)}.pill{display:inline-block;border-radius:20px;padding:3px 8px;background:#eee9fc;color:var(--p);font-size:11px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:20px}
+.iconbtn{background:#ffffff24;color:#fff;border:1px solid #ffffff55;padding:9px 11px;white-space:nowrap}
+.modalback{position:fixed;inset:0;background:#17102288;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}
+.modalback.show{display:flex}.modal{background:white;border-radius:18px;padding:20px;width:min(100%,420px);box-shadow:0 12px 40px #0003}.modal h2{margin-bottom:8px}
+.modalactions{display:flex;gap:8px;margin-top:16px}.modalactions button{flex:1}
+@media(min-width:560px){.grid{grid-template-columns:repeat(4,1fr)}}
+@media(display-mode:standalone){header{border-radius:0 0 24px 24px}}
+</style>
+</head>
+<body>
+<header><div class="headrow"><div><h1>📅 Daily Hajari Tracker</h1><p id="tagline">रोजची हजेरी • पगार • बोनस • जमा-खर्च</p></div><button class="iconbtn" id="settingsBtn" aria-label="Settings">⚙️ <span id="settingsLabel">सेटिंग्ज</span></button></div></header>
+<main>
+<section class="card">
+<h2 data-i18n="monthlySummary">📊 या महिन्याचा हिशोब</h2>
+<div class="grid">
+<div class="stat"><small data-i18n="salaryTotal">एकूण पगार</small><strong id="salaryTotal">₹0</strong></div>
+<div class="stat"><small data-i18n="bonusTotal">एकूण बोनस</small><strong id="bonusTotal">₹0</strong></div>
+<div class="stat"><small data-i18n="advanceTotal">अॅडव्हान्स</small><strong id="advanceTotal">₹0</strong></div>
+<div class="stat"><small data-i18n="dueTotal">बाकी रक्कम</small><strong id="dueTotal">₹0</strong></div>
+</div>
+<div class="row" style="margin-top:10px">
+<div class="stat"><small data-i18n="presentDays">हजर दिवस</small><strong id="presentDays">0</strong></div>
+<div class="stat"><small data-i18n="halfDays">अर्धा दिवस</small><strong id="halfDays">0</strong></div>
+</div>
+</section>
+<section class="card">
+<h2 data-i18n="addEntry">➕ रोजची नोंद करा</h2>
+<label for="date" data-i18n="date">तारीख</label><input type="date" id="date">
+<div class="row">
+<div><label for="status" data-i18n="attendance">हजेरी</label><select id="status"><option value="present" data-i18n="present">पूर्ण हजर</option><option value="half" data-i18n="half">अर्धा दिवस</option><option value="absent" data-i18n="absent">गैरहजर</option><option value="off" data-i18n="off">सुट्टी</option></select></div>
+<div><label for="dailyRate" data-i18n="dailyRate">पूर्ण दिवसाचा पगार (₹)</label><input id="dailyRate" type="number" min="0" placeholder="उदा. 500"></div>
+</div>
+<div class="row">
+<div><label for="bonus" data-i18n="bonus">आजचा बोनस (₹)</label><input id="bonus" type="number" min="0" value="0"></div>
+<div><label for="advance" data-i18n="advance">आज घेतलेला अॅडव्हान्स (₹)</label><input id="advance" type="number" min="0" value="0"></div>
+</div>
+<label for="paid" data-i18n="paid">आज मिळालेला पगार/पेमेंट (₹)</label><input id="paid" type="number" min="0" value="0">
+<label for="note" data-i18n="note">टीप (ऐच्छिक)</label><input id="note" type="text" placeholder="उदा. ओव्हरटाईम / कामाचे ठिकाण">
+<button class="primary" id="saveBtn">नोंद सेव्ह करा</button>
+<p class="muted" style="font-size:11px;margin:9px 0 0" data-i18n="overwriteHint">एकाच तारखेची नोंद पुन्हा सेव्ह केल्यास ती अपडेट होईल.</p>
+</section>
+<section class="card">
+<h2 data-i18n="monthlyRecords">📆 महिन्याच्या नोंदी</h2>
+<label for="month" data-i18n="selectMonth">महिना निवडा</label><input type="month" id="month">
+<div id="records"><p class="muted">अजून नोंदी नाहीत.</p></div>
+<div class="actions">
+<button class="secondary" id="csvBtn">CSV डाउनलोड</button><button class="secondary" id="backupBtn">बॅकअप डाउनलोड</button><button class="secondary" id="restoreBtn">बॅकअप रिस्टोर</button>
+<input type="file" id="restoreFile" accept=".json,application/json" hidden>
+</div>
+</section>
+<footer id="footerText">तुमचा डेटा या मोबाईलच्या ब्राउझरमध्ये सेव्ह होतो. ब्राउझर डेटा क्लिअर करण्यापूर्वी बॅकअप घ्या.</footer>
+</main>
+<div class="modalback" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+<div class="modal"><h2 id="settingsTitle">⚙️ सेटिंग्ज</h2>
+<label for="languageSelect" data-i18n="language">भाषा</label><select id="languageSelect"><option value="mr">मराठी</option><option value="hi">हिंदी</option><option value="en">English</option></select>
+<button class="secondary" id="fullscreenBtn" style="width:100%;margin-top:12px">पूर्ण स्क्रीन करा</button>
+<div class="modalactions"><button class="secondary" id="closeSettings">बंद करा</button></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+const today=new Date(), localDate=new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10);
+$('date').value=localDate;$('month').value=localDate.slice(0,7);
+let rows=JSON.parse(localStorage.getItem('hajariRowsV1')||'[]');
+let lang=localStorage.getItem('hajariLanguageV2')||'mr';
+const translations={
+mr:{tagline:'रोजची हजेरी • पगार • बोनस • जमा-खर्च',settings:'सेटिंग्ज',monthlySummary:'📊 या महिन्याचा हिशोब',salaryTotal:'एकूण पगार',bonusTotal:'एकूण बोनस',advanceTotal:'अॅडव्हान्स',dueTotal:'बाकी रक्कम',presentDays:'हजर दिवस',halfDays:'अर्धा दिवस',addEntry:'➕ रोजची नोंद करा',date:'तारीख',attendance:'हजेरी',present:'पूर्ण हजर',half:'अर्धा दिवस',absent:'गैरहजर',off:'सुट्टी',dailyRate:'पूर्ण दिवसाचा पगार (₹)',bonus:'आजचा बोनस (₹)',advance:'आज घेतलेला अॅडव्हान्स (₹)',paid:'आज मिळालेला पगार/पेमेंट (₹)',note:'टीप (ऐच्छिक)',notePlaceholder:'उदा. ओव्हरटाईम / कामाचे ठिकाण',save:'नोंद सेव्ह करा',update:'बदल सेव्ह करा',overwriteHint:'एकाच तारखेची नोंद पुन्हा सेव्ह केल्यास ती अपडेट होईल.',monthlyRecords:'📆 महिन्याच्या नोंदी',selectMonth:'महिना निवडा',empty:'या महिन्यात अजून नोंदी नाहीत.',csv:'CSV डाउनलोड',backup:'बॅकअप डाउनलोड',restore:'बॅकअप रिस्टोर',footer:'तुमचा डेटा या मोबाईलच्या ब्राउझरमध्ये सेव्ह होतो. ब्राउझर डेटा क्लिअर करण्यापूर्वी बॅकअप घ्या.',language:'भाषा',fullscreen:'पूर्ण स्क्रीन करा',exitFullscreen:'पूर्ण स्क्रीनमधून बाहेर पडा',close:'बंद करा',chooseDate:'तारीख निवडा.',validRate:'योग्य पगार भरा.',saved:'नोंद सेव्ह झाली.',deleted:' ची नोंद डिलीट करायची?',restored:'बॅकअप रिस्टोर झाला.',invalidBackup:'ही योग्य बॅकअप फाइल नाही.',edit:'बदल',delete:'डिलीट',statusPresent:'हजर',statusHalf:'अर्धा दिवस',statusAbsent:'गैरहजर',statusOff:'सुट्टी',salary:'पगार',bonusShort:'बोनस',advanceShort:'अॅडव्हान्स',payment:'पेमेंट'},
+hi:{tagline:'रोज़ की हाज़िरी • वेतन • बोनस • जमा-खर्च',settings:'सेटिंग्स',monthlySummary:'📊 इस महीने का हिसाब',salaryTotal:'कुल वेतन',bonusTotal:'कुल बोनस',advanceTotal:'अग्रिम',dueTotal:'बाकी राशि',presentDays:'उपस्थित दिन',halfDays:'आधा दिन',addEntry:'➕ रोज़ की एंट्री करें',date:'तारीख',attendance:'हाज़िरी',present:'पूरा उपस्थित',half:'आधा दिन',absent:'अनुपस्थित',off:'छुट्टी',dailyRate:'पूरे दिन का वेतन (₹)',bonus:'आज का बोनस (₹)',advance:'आज लिया गया अग्रिम (₹)',paid:'आज मिला वेतन/भुगतान (₹)',note:'नोट (वैकल्पिक)',notePlaceholder:'जैसे ओवरटाइम / काम की जगह',save:'एंट्री सेव करें',update:'बदलाव सेव करें',overwriteHint:'एक ही तारीख की एंट्री दोबारा सेव करने पर अपडेट हो जाएगी।',monthlyRecords:'📆 महीने की एंट्री',selectMonth:'महीना चुनें',empty:'इस महीने अभी कोई एंट्री नहीं है।',csv:'CSV डाउनलोड',backup:'बैकअप डाउनलोड',restore:'बैकअप रिस्टोर',footer:'आपका डेटा इस मोबाइल के ब्राउज़र में सेव होता है। ब्राउज़र डेटा साफ़ करने से पहले बैकअप लें।',language:'भाषा',fullscreen:'फुल स्क्रीन करें',exitFullscreen:'फुल स्क्रीन से बाहर आएँ',close:'बंद करें',chooseDate:'तारीख चुनें।',validRate:'सही वेतन भरें।',saved:'एंट्री सेव हो गई।',deleted:' की एंट्री डिलीट करें?',restored:'बैकअप रिस्टोर हो गया।',invalidBackup:'यह सही बैकअप फ़ाइल नहीं है।',edit:'बदलें',delete:'डिलीट',statusPresent:'उपस्थित',statusHalf:'आधा दिन',statusAbsent:'अनुपस्थित',statusOff:'छुट्टी',salary:'वेतन',bonusShort:'बोनस',advanceShort:'अग्रिम',payment:'भुगतान'},
+en:{tagline:'Daily attendance • Salary • Bonus • Income & expenses',settings:'Settings',monthlySummary:'📊 This Month Summary',salaryTotal:'Total Salary',bonusTotal:'Total Bonus',advanceTotal:'Advance',dueTotal:'Amount Due',presentDays:'Present Days',halfDays:'Half Days',addEntry:'➕ Add Daily Entry',date:'Date',attendance:'Attendance',present:'Full Present',half:'Half Day',absent:'Absent',off:'Day Off',dailyRate:'Full-day Salary (₹)',bonus:'Today’s Bonus (₹)',advance:'Advance Taken Today (₹)',paid:'Salary/Payment Received Today (₹)',note:'Note (Optional)',notePlaceholder:'e.g. Overtime / Work location',save:'Save Entry',update:'Save Changes',overwriteHint:'Saving the same date again will update that entry.',monthlyRecords:'📆 Monthly Records',selectMonth:'Select Month',empty:'No entries for this month yet.',csv:'Download CSV',backup:'Download Backup',restore:'Restore Backup',footer:'Your data is saved in this mobile browser. Take a backup before clearing browser data.',language:'Language',fullscreen:'Enter Full Screen',exitFullscreen:'Exit Full Screen',close:'Close',chooseDate:'Please choose a date.',validRate:'Please enter a valid salary.',saved:'Entry saved.',deleted:' Delete this entry?',restored:'Backup restored.',invalidBackup:'This is not a valid backup file.',edit:'Edit',delete:'Delete',statusPresent:'Present',statusHalf:'Half Day',statusAbsent:'Absent',statusOff:'Day Off',salary:'Salary',bonusShort:'Bonus',advanceShort:'Advance',payment:'Payment'}
+};
+function t(k){return translations[lang][k]||translations.en[k]||k}
+function applyLanguage(){
+ document.documentElement.lang=lang;
+ document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;el.textContent=t(k)});
+ $('tagline').textContent=t('tagline');$('settingsLabel').textContent=t('settings');$('settingsTitle').textContent='⚙️ '+t('settings');
+ $('note').placeholder=t('notePlaceholder');$('saveBtn').textContent=editDate?t('update'):t('save');
+ $('csvBtn').textContent=t('csv');$('backupBtn').textContent=t('backup');$('restoreBtn').textContent=t('restore');
+ $('fullscreenBtn').textContent=document.fullscreenElement?t('exitFullscreen'):t('fullscreen');$('closeSettings').textContent=t('close');
+ render();
+}
+function money(n){return '₹'+(Number(n)||0).toLocaleString('en-IN',{maximumFractionDigits:2})}
+function save(){localStorage.setItem('hajariRowsV1',JSON.stringify(rows));render()}
+function monthRows(){return rows.filter(r=>String(r.date||'').startsWith($('month').value)).sort((a,b)=>b.date.localeCompare(a.date))}
+function statusLabel(s){return ({present:t('statusPresent'),half:t('statusHalf'),absent:t('statusAbsent'),off:t('statusOff')})[s]||s}
+let editDate=null;
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){
+ const list=monthRows();let sal=0,bon=0,adv=0,paid=0,pres=0,half=0;
+ list.forEach(r=>{sal+=r.status==='present'?Number(r.rate||0):r.status==='half'?Number(r.rate||0)/2:0;bon+=Number(r.bonus||0);adv+=Number(r.advance||0);paid+=Number(r.paid||0);if(r.status==='present')pres++;if(r.status==='half')half++});
+ $('salaryTotal').textContent=money(sal);$('bonusTotal').textContent=money(bon);$('advanceTotal').textContent=money(adv);$('dueTotal').textContent=money(sal+bon-paid);$('presentDays').textContent=pres;$('halfDays').textContent=half;
+ $('records').innerHTML=list.length?list.map(r=>`<div class="entry"><div><b>${escapeHtml(r.date)} <span class="pill">${escapeHtml(statusLabel(r.status))}</span></b><span class="muted">${t('salary')} ${money(r.status==='present'?r.rate:r.status==='half'?r.rate/2:0)} · ${t('bonusShort')} ${money(r.bonus)} · ${t('advanceShort')} ${money(r.advance)} · ${t('payment')} ${money(r.paid)}${r.note?' · '+escapeHtml(r.note):''}</span></div><div style="white-space:nowrap"><button class="secondary" onclick="editRow('${escapeHtml(r.date)}')">${t('edit')}</button> <button class="danger" onclick="deleteRow('${escapeHtml(r.date)}')">X</button></div></div>`).join(''):`<p class="muted">${t('empty')}</p>`;
+}
+$('saveBtn').onclick=()=>{
+ const date=$('date').value,rate=Number($('dailyRate').value),status=$('status').value;
+ if(!date){alert(t('chooseDate'));return}if(!Number.isFinite(rate)||rate<0){alert(t('validRate'));return}
+ const r={date,status,rate,bonus:Math.max(0,Number($('bonus').value)||0),advance:Math.max(0,Number($('advance').value)||0),paid:Math.max(0,Number($('paid').value)||0),note:$('note').value.trim()};
+ const i=rows.findIndex(x=>x.date===date);if(i>=0)rows[i]=r;else rows.push(r);editDate=null;$('saveBtn').textContent=t('save');save();alert(t('saved'));
+};
+window.editRow=date=>{const r=rows.find(x=>x.date===date);if(!r)return;editDate=date;$('date').value=r.date;$('status').value=r.status;$('dailyRate').value=r.rate;$('bonus').value=r.bonus;$('advance').value=r.advance;$('paid').value=r.paid;$('note').value=r.note||'';$('saveBtn').textContent=t('update');window.scrollTo({top:0,behavior:'smooth'})};
+window.deleteRow=date=>{if(confirm(date+t('deleted'))){rows=rows.filter(x=>x.date!==date);save()}};
+$('month').onchange=render;
+$('csvBtn').onclick=()=>{const data=monthRows();const header=[t('date'),t('attendance'),t('dailyRate'),t('bonus'),t('advance'),t('paid'),t('note')];const lines=[header,...data.map(r=>[r.date,statusLabel(r.status),r.rate,r.bonus,r.advance,r.paid,r.note||''])].map(a=>a.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');download('\ufeff'+lines,'hajari-'+$('month').value+'.csv','text/csv;charset=utf-8')};
+$('backupBtn').onclick=()=>download(JSON.stringify(rows,null,2),'hajari-backup.json','application/json');
+$('restoreBtn').onclick=()=>$('restoreFile').click();
+$('restoreFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const parsed=JSON.parse(await f.text());if(!Array.isArray(parsed))throw Error();rows=parsed;save();alert(t('restored'))}catch{alert(t('invalidBackup'))}e.target.value=''};
+function download(content,name,type){const a=document.createElement('a'),u=URL.createObjectURL(new Blob([content],{type}));a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+$('settingsBtn').onclick=()=>$('settingsModal').classList.add('show');
+$('closeSettings').onclick=()=>$('settingsModal').classList.remove('show');
+$('settingsModal').addEventListener('click',e=>{if(e.target===$('settingsModal'))$('settingsModal').classList.remove('show')});
+$('languageSelect').value=lang;
+$('languageSelect').onchange=()=>{lang=$('languageSelect').value;localStorage.setItem('hajariLanguageV2',lang);applyLanguage()};
+$('fullscreenBtn').onclick=async()=>{try{if(!document.fullscreenElement){await document.documentElement.requestFullscreen()}else{await document.exitFullscreen()}}catch(e){alert('Fullscreen is not supported by this browser.')}applyLanguage()};
+document.addEventListener('fullscreenchange',()=>{$('fullscreenBtn').textContent=document.fullscreenElement?t('exitFullscreen'):t('fullscreen')});
+applyLanguage();
+</script>
+</body></html>
